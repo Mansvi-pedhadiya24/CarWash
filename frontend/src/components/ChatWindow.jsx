@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react'
-import { Wifi, WifiOff, Trash2, Send, Car } from 'lucide-react'
-import { useWebSocket } from '@/hooks/usewebsocket'
-import { ScrollArea } from '@/components/ui/scroll-area' 
+import { Wifi, WifiOff, Trash2, Send, Car, X } from 'lucide-react'
+import { useWebSocket } from '@/hooks/useWebSocket'
 // import MessageBubble from '@/components/messagebubble'
 import { ChatBubble } from '@/components/ChatBubble'
 
@@ -10,7 +9,6 @@ export function ChatWindow({ onClose }) {
   const inputRef = useRef(null)
   const scrollRef = useRef(null)
 
-  // ઓટોમેટિક સ્ક્રોલ ડાઉન કરવા માટે
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollIntoView({ behavior: 'smooth' })
@@ -34,8 +32,9 @@ export function ChatWindow({ onClose }) {
 
   return (
     <div className="flex h-[560px] w-[380px] flex-col overflow-hidden rounded-2xl bg-slate-50 shadow-2xl border border-slate-200/80 sm:w-[400px]">
+      
       {/* Header Profile Section */}
-      <div className="flex items-center justify-between bg-gradient-to-r bg-blue-600 px-4 py-3.5 text-white">
+      <div className="flex items-center justify-between bg-blue-600 px-4 py-3.5 text-white shadow-md z-10">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 backdrop-blur-md ring-1 ring-white/20">
             <Car className="h-5 w-5 text-blue-100" />
@@ -45,7 +44,10 @@ export function ChatWindow({ onClose }) {
             <div className="flex items-center gap-1.5 text-[11px] text-blue-100">
               {isConnected ? (
                 <>
-                  <Wifi className="h-3 w-3 text-emerald-400 animate-pulse" />
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </span>
                   <span>Online Agent</span>
                 </>
               ) : (
@@ -58,19 +60,35 @@ export function ChatWindow({ onClose }) {
           </div>
         </div>
         
-        <button 
-          onClick={clearMessages}
-          title="Clear Conversation"
-          className="rounded-lg p-1.5 text-blue-100 transition-colors hover:bg-white/10 hover:text-white"
-        >
-          <Trash2 className="h-4 w-4" />
-        </button>
+        <div className="flex items-center gap-1">
+          {/* Clear Chat Button */}
+          <button 
+            onClick={clearMessages}
+            title="Clear Conversation"
+            type="button"
+            className="rounded-lg p-1.5 text-blue-100 transition-colors hover:bg-white/10 hover:text-white"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+
+          {/* Close Window Button (તમારા લેઆઉટ પ્રમાણે જો ક્રોસ બટન જોઈતું હોય તો) */}
+          {onClose && (
+            <button 
+              onClick={onClose}
+              title="Close Chat"
+              type="button"
+              className="rounded-lg p-1.5 text-blue-100 transition-colors hover:bg-white/10 hover:text-white"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* Main Chat Area */}
-      <ScrollArea className="flex-1 px-4 py-3">
+      {/* Main Chat Area (FIXED: પાથ ડિપેન્ડન્સી વગરનું પ્યોર ઓટો-સ્ક્રોલ બોક્સ) */}
+      <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 custom-scrollbar">
         {messages.length === 0 ? (
-          <div className="flex h-[320px] flex-col items-center justify-center text-center px-4">
+          <div className="flex min-h-[400px] flex-col items-center justify-center text-center px-2">
             <div className="mb-3 rounded-full bg-blue-50 p-3 text-blue-500">
               <Car className="h-8 w-8" />
             </div>
@@ -78,12 +96,13 @@ export function ChatWindow({ onClose }) {
             <p className="mt-1 text-xs text-slate-400">Ask me anything about wash plans, pricing, or bookings.</p>
             
             {/* Suggestion Chips */}
-            <div className="mt-5 grid grid-cols-1 gap-2 w-full">
+            <div className="mt-5 grid grid-cols-1 gap-2 w-full max-w-[280px]">
               {suggestions.map((text, idx) => (
                 <button
                   key={idx}
+                  type="button"
                   onClick={() => sendMessage(text)}
-                  className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-left text-xs font-medium text-slate-600 transition-all hover:border-blue-400 hover:bg-blue-50/50 hover:text-blue-600"
+                  className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left text-xs font-medium text-slate-600 transition-all hover:border-blue-400 hover:bg-blue-50/50 hover:text-blue-600 shadow-sm"
                 >
                   {text}
                 </button>
@@ -91,7 +110,8 @@ export function ChatWindow({ onClose }) {
             </div>
           </div>
         ) : (
-          <div className="space-y-3">
+          <>
+            {/* બધા મેસેજીસ અહીં લોડ થશે */}
             {messages.map((msg) => (
               <ChatBubble key={msg.id} message={msg} />
             ))}
@@ -108,13 +128,15 @@ export function ChatWindow({ onClose }) {
                 </div>
               </div>
             )}
+            
+            {/* આ એન્કર ડિવાઇસ સ્ક્રોલિંગ ટાર્ગેટ છે */}
             <div ref={scrollRef} />
-          </div>
+          </>
         )}
-      </ScrollArea>
+      </div>
 
       {/* Footer Chat Input Form */}
-      <form onSubmit={handleSend} className="border-t border-slate-200 bg-white p-3 flex items-center gap-2">
+      <form onSubmit={handleSend} className="border-t border-slate-200 bg-white p-3 flex items-center gap-2 z-10">
         <input
           ref={inputRef}
           type="text"
@@ -123,7 +145,7 @@ export function ChatWindow({ onClose }) {
         />
         <button
           type="submit"
-          className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white shadow-md transition-all hover:bg-blue-700 active:scale-95"
+          className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white shadow-md transition-all hover:bg-blue-700 active:scale-95 shrink-0"
         >
           <Send className="h-4 w-4" />
         </button>
