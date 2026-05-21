@@ -1,7 +1,10 @@
 from fastapi import WebSocket
 from typing import Dict
 
+
 class ConnectionManager:
+    """Active WebSocket connections track kare."""
+
     def __init__(self):
         self.active_connections: Dict[str, WebSocket] = {}
 

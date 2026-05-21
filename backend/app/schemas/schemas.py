@@ -1,59 +1,21 @@
-# from pydantic import BaseModel
-# from typing import Optional
-
-# class ValidateRequest(BaseModel):
-#     origin: str
-
-# class ValidateResponse(BaseModel):
-#     valid: bool
-#     domain_name: str
-#     message: str
-
-# class ChatMessageIn(BaseModel):
-#     token: str
-#     session_uuid: str
-#     message: str
-
 from pydantic import BaseModel, Field
 from typing import Optional, Literal
 from datetime import datetime
 
 
-# ── HTTP: Validate ────────────────────────────────────────────────────────────
-
+# ── HTTP: /api/v1/validate ────────────────────────────────────────────────────
 class ValidateRequest(BaseModel):
     origin: str = Field(..., description="window.location.hostname")
 
 
 class ValidateResponse(BaseModel):
-    valid: bool
+    valid:       bool
     domain_name: Optional[str] = None
-    message: str = ""
+    message:     str = ""
 
 
-# ── WebSocket message types ───────────────────────────────────────────────────
-#
-#  CLIENT  →  SERVER  (client sends this JSON over WS)
-#  {
-#    "token":        "Bearer token string",
-#    "origin":       "mycarwash.com",
-#    "session_uuid": "uuid-v4",
-#    "message":      "user text"
-#  }
-#
-#  SERVER  →  CLIENT  (server streams these JSON frames)
-#
-#  During streaming:
-#    { "type": "chunk",  "data": "partial text" }
-#
-#  When done:
-#    { "type": "done",   "data": "" }
-#
-#  On error:
-#    { "type": "error",  "data": "error message" }
-
+# ── WebSocket Messages ────────────────────────────────────────────────────────
 class WSClientMessage(BaseModel):
-    """Validated shape of every message the client sends over WebSocket."""
     token:        str = Field(..., min_length=1)
     origin:       str = Field(..., min_length=1)
     session_uuid: str = Field(..., min_length=36, max_length=36)
@@ -61,17 +23,17 @@ class WSClientMessage(BaseModel):
 
 
 class WSServerMessage(BaseModel):
-    """Shape of every frame the server sends back over WebSocket."""
     type: Literal["chunk", "done", "error"]
     data: str = ""
 
 
-# ── Admin ─────────────────────────────────────────────────────────────────────
-
+# ── Admin Schemas ─────────────────────────────────────────────────────────────
 class DomainCreate(BaseModel):
     domain_name:   str
     contact_email: str
-    expires_at:    Optional[datetime] = None
+    # expires_at INTENTIONALLY removed from request schema —
+    # user thi set na thay, hamesha NULL (never expire) rahe
+    # Future ma admin panel thi manually set kari shakashe
 
 
 class DomainOut(BaseModel):

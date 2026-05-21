@@ -1,89 +1,45 @@
-# import datetime
-# from sqlalchemy.orm import Session
-# from fastapi import HTTPException, status
-# from app.models.chatbot_models import DomainToken, ChatSession, ChatMessage
-
-
-# def validate_token_and_origin(token: str, origin: str, db: Session) -> DomainToken:
-#     clean_origin = origin.replace("http://", "").replace("https://", "").split("/")[0].split(":")[0]
-
-#     token_row = db.query(DomainToken).filter(
-#         DomainToken.token == token,
-#         DomainToken.is_active == 1
-#     ).first()
-
-#     if not token_row or token_row.domain.is_active == 0:
-#         raise HTTPException(
-#             status_code=status.HTTP_403_FORBIDDEN, 
-#             detail="Invalid or inactive token."
-#         )
-
-#     if token_row.domain.domain_name != clean_origin:
-#         raise HTTPException(
-#             status_code=status.HTTP_403_FORBIDDEN, 
-#             detail=f"Unauthorized domain origin: {clean_origin}"
-#         )
-
-#     token_row.last_used_at = datetime.datetime.utcnow()
-#     db.commit()
-
-#     return token_row
-
-
-# def get_or_create_session(db: Session, token_id: int, session_uuid: str) -> ChatSession:
-    
-#     session_row = db.query(ChatSession).filter(ChatSession.session_uuid == session_uuid).first()
-#     if not session_row:
-#         session_row = ChatSession(
-#             domain_token_id=token_id,
-#             session_uuid=session_uuid
-#         )
-#         db.add(session_row)
-#         db.commit()
-#         db.refresh(session_row)
-#     return session_row
-
-
-# def save_chat_message(db: Session, session_id: int, role: str, content: str):
-    
-#     new_msg = ChatMessage(
-#         session_id=session_id,
-#         role=role,
-#         content=content
-#     )
-#     db.add(new_msg)
-#     db.commit()
-
 from datetime import datetime, date
 from sqlalchemy.orm import Session
-from fastapi import HTTPException, Security, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import HTTPException, status
 
 from app.models.chatbot_models import DomainToken, Domain, UsageLog
 
-bearer_scheme = HTTPBearer()
+LOCALHOST_ALIASES = {"localhost", "127.0.0.1", "0.0.0.0", "::1"}
 
 
 def _clean_origin(origin: str) -> str:
-    return (
+    """
+    Origin string clean kare.
+    "https://www.mycarwash.com:5173/page" → "mycarwash.com"
+    "127.0.0.1:8000" → "127.0.0.1"
+    "localhost:3000" → "localhost"
+    """
+    cleaned = (
         origin
         .replace("https://", "")
         .replace("http://", "")
-        .split("/")[0]
-        .split(":")[0]
+        .split("/")[0] 
+        .split(":")[0]   
         .strip()
         .lower()
+        .lstrip("www.")
     )
+    return cleaned
+
+
+def _normalize_origin(origin: str) -> str:
+    
+    if origin in LOCALHOST_ALIASES:
+        return "localhost"
+    return origin
 
 
 def validate_token_and_origin(token: str, origin: str, db: Session) -> DomainToken:
-    """
-    Validates Bearer token + origin domain.
-    Used by both HTTP endpoints and WebSocket handler.
-    Raises HTTP 403 on failure.
-    """
-    clean = _clean_origin(origin)
+    
+    clean     = _clean_origin(origin)
+    normalized = _normalize_origin(clean)
 
+    # Token DB ma check karo
     token_row: DomainToken | None = (
         db.query(DomainToken)
         .filter(DomainToken.token == token, DomainToken.is_active == 1)
@@ -98,27 +54,31 @@ def validate_token_and_origin(token: str, origin: str, db: Session) -> DomainTok
 
     domain: Domain = token_row.domain
 
-    if not domain.is_active:
+    # Domain active che?
+    if not int(domain.is_active):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Domain is suspended.",
         )
 
+    # Domain expire thi gayi?
     if domain.expires_at and datetime.utcnow() > domain.expires_at:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Domain subscription has expired.",
         )
 
-    registered = domain.domain_name.lower().lstrip("www.")
-    incoming   = clean.lstrip("www.")
+    # Registered domain normalize karo
+    registered = _normalize_origin(domain.domain_name.lower().lstrip("www."))
 
-    if incoming != registered and not incoming.endswith("." + registered):
+    # Origin match check
+    if normalized != registered and not normalized.endswith("." + registered):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=f"Origin '{clean}' is not authorised for this token.",
         )
 
+    # Validation pass!
     token_row.last_used_at = datetime.utcnow()
     db.commit()
 
@@ -126,7 +86,9 @@ def validate_token_and_origin(token: str, origin: str, db: Session) -> DomainTok
 
 
 def upsert_usage_log(domain_id: int, db: Session, sessions: int = 0, messages: int = 0):
+    """Daily usage log update kare."""
     today = date.today()
+
     log = db.query(UsageLog).filter(
         UsageLog.domain_id == domain_id,
         UsageLog.log_date  == today,
@@ -143,4 +105,5 @@ def upsert_usage_log(domain_id: int, db: Session, sessions: int = 0, messages: i
             total_messages=messages,
         )
         db.add(log)
+
     db.commit()

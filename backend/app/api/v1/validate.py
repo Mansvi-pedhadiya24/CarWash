@@ -1,12 +1,3 @@
-"""
-POST /api/v1/validate
-Header: Authorization: Bearer <token>
-Body:   { "origin": "window.location.hostname" }
-
-Called by the React/Vite frontend on page load.
-Returns { valid: true } → show chatbot popup
-Returns 403            → hide chatbot popup
-"""
 from fastapi import APIRouter, Depends, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session

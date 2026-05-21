@@ -1,18 +1,16 @@
 import logging
 from typing import AsyncGenerator
-from groq import AsyncGroq  
+
+from groq import AsyncGroq
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
-# મોડલનો સાચો પાથ આપણે શિફ્ટ કરેલી નવી સિંગલ ફાઇલ મુજબ
-from app.models.chatbot_models import ChatMessage, ChatSession 
+from app.models.chatbot_models import ChatMessage, ChatSession
 
-# એરર ટ્રેકિંગ માટે લોગર સેટઅપ
 logger = logging.getLogger(__name__)
 
 
 def _build_messages(session: ChatSession, user_message: str, db: Session) -> list[dict]:
-    """Load last 20 DB messages + new user message as Groq message list."""
     try:
         history = (
             db.query(ChatMessage)
@@ -26,7 +24,6 @@ def _build_messages(session: ChatSession, user_message: str, db: Session) -> lis
         return messages
     except Exception as e:
         logger.error(f"Error building chat history: {e}")
-       
         return [{"role": "user", "content": user_message}]
 
 
@@ -36,21 +33,20 @@ async def stream_ai_reply(
     db: Session,
 ) -> AsyncGenerator[str, None]:
     """
-    Async generator — yields text chunks from Groq streaming API (Qwen Model).
+    Async generator — Groq AsyncGroq thi streaming chunks yield kare.
 
-    Usage in WebSocket handler:
+    WebSocket handler aa rite use kare:
         full_reply = ""
-        async for chunk in stream_ai_reply(session, msg, db):
+        async for chunk in stream_ai_reply(session, message, db):
             full_reply += chunk
-            await websocket.send_json({"type": "chunk", "data": chunk})
-        # save full_reply to DB after loop
+            await websocket.send_text(WSServerMessage(type="chunk", data=chunk).model_dump_json())
     """
     messages = _build_messages(session, user_message, db)
 
     try:
+        # AsyncGroq — truly async, WebSocket event loop block nahi kare
         client = AsyncGroq(api_key=settings.GROQ_API_KEY)
 
-        # AsyncGroq માં completions.create સાથે stream=True
         stream = await client.chat.completions.create(
             model=settings.GROQ_MODEL,
             messages=[
@@ -59,17 +55,13 @@ async def stream_ai_reply(
             ],
             max_tokens=512,
             temperature=0.7,
-            stream=True,  # streaming enabled
+            stream=True,
         )
 
-    
         async for chunk in stream:
-            if chunk.choices and len(chunk.choices) > 0:
-                delta = chunk.choices[0].delta
-                if delta and delta.content:
-                    yield delta.content
+            if chunk.choices and chunk.choices[0].delta and chunk.choices[0].delta.content:
+                yield chunk.choices[0].delta.content
 
     except Exception as e:
-        logger.error(f"Error during Groq Streaming: {e}")
-        print(f"Error during Groq Streaming: {e}")
-        yield "Sorry, I encountered an error while processing your request. Please check connection or API key."
+        logger.error(f"Groq streaming error: {e}")
+        yield "Sorry, I encountered an error. Please try again."
