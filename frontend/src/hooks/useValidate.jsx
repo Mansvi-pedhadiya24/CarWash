@@ -1,10 +1,3 @@
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// useValidate.ts
-// Kaam: Page load pe backend validate call kare
-//       Token + domain valid che? → chatbot show karo
-//       Invalid → chatbot j show nahi thay
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 import { useState, useEffect } from 'react'
 import { API, CONFIG } from '@/lib/config'
 

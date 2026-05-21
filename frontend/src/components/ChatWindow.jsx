@@ -1,18 +1,15 @@
 import { useEffect, useRef } from 'react'
-import { Wifi, WifiOff, Trash2, Send, Car, X } from 'lucide-react'
+import { WifiOff, Trash2, Send, Car, X } from 'lucide-react'
 import { useWebSocket } from '@/hooks/useWebSocket'
-// import MessageBubble from '@/components/messagebubble'
 import { ChatBubble } from '@/components/ChatBubble'
 
 export function ChatWindow({ onClose }) {
   const { messages, isConnected, isTyping, sendMessage, clearMessages } = useWebSocket()
   const inputRef = useRef(null)
-  const scrollRef = useRef(null)
+  const bottomRef = useRef(null)
 
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollIntoView({ behavior: 'smooth' })
-    }
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
   }, [messages, isTyping])
 
   const handleSend = (e) => {
@@ -24,85 +21,138 @@ export function ChatWindow({ onClose }) {
   }
 
   const suggestions = [
-    "🏎️ Full Body Wash Price?",
+    "🏎️ Full Car Wash Price?",
     "📅 Book an Appointment",
     "✨ Ceramic Coating Details",
     "📍 Where is your workshop?"
   ]
 
   return (
-    <div className="flex h-[560px] w-[380px] flex-col overflow-hidden rounded-2xl bg-slate-50 shadow-2xl border border-slate-200/80 sm:w-[400px]">
-      
-      {/* Header Profile Section */}
-      <div className="flex items-center justify-between bg-blue-600 px-4 py-3.5 text-white shadow-md z-10">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 backdrop-blur-md ring-1 ring-white/20">
-            <Car className="h-5 w-5 text-blue-100" />
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '500px',
+        width: '380px',
+        overflow: 'hidden',
+        borderRadius: '1rem',
+        border: '1px solid rgba(226,232,240,0.8)',
+        boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
+        backgroundColor: '#f8fafc',
+      }}
+    >
+      {/* Header — fixed height, never shrinks */}
+      <div
+        style={{
+          flexShrink: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          backgroundColor: '#d81d1d',
+          padding: '14px 16px',
+          color: 'white',
+          zIndex: 10,
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{
+            width: '40px', height: '40px',
+            borderRadius: '12px',
+            backgroundColor: 'rgba(255,255,255,0.1)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <Car style={{ width: '20px', height: '20px', color: '#bfdbfe' }} />
           </div>
           <div>
-            <h3 className="text-sm font-semibold tracking-wide">CarWash AI Support</h3>
-            <div className="flex items-center gap-1.5 text-[11px] text-blue-100">
+            <p style={{ margin: 0, fontSize: '13px', fontWeight: 600, letterSpacing: '0.03em' }}>
+              CarWash AI Support
+            </p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
               {isConnected ? (
                 <>
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                  </span>
-                  <span>Online Agent</span>
+                  <span style={{
+                    width: '8px', height: '8px', borderRadius: '50%',
+                    backgroundColor: '#10b924', display: 'inline-block',
+                  }} />
+                  <span style={{ fontSize: '11px', color: '#bfdbfe' }}>Online Agent</span>
                 </>
               ) : (
                 <>
-                  <WifiOff className="h-3 w-3 text-rose-300" />
-                  <span className="text-rose-200 font-medium">Reconnecting...</span>
+                  <WifiOff style={{ width: '12px', height: '12px', color: '#fca5a5' }} />
+                  <span style={{ fontSize: '11px', color: '#fca5a5', fontWeight: 500 }}>Reconnecting...</span>
                 </>
               )}
             </div>
           </div>
         </div>
-        
-        <div className="flex items-center gap-1">
-          {/* Clear Chat Button */}
-          <button 
-            onClick={clearMessages}
-            title="Clear Conversation"
-            type="button"
-            className="rounded-lg p-1.5 text-blue-100 transition-colors hover:bg-white/10 hover:text-white"
-          >
-            <Trash2 className="h-4 w-4" />
-          </button>
-
-          {/* Close Window Button (તમારા લેઆઉટ પ્રમાણે જો ક્રોસ બટન જોઈતું હોય તો) */}
+        <div style={{ display: 'flex', gap: '4px' }}>
+          {/* <button onClick={clearMessages} title="Clear" type="button" style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            padding: '6px', borderRadius: '8px', color: '#bfdbfe',
+          }}>
+            <Trash2 style={{ width: '16px', height: '16px' }} />
+          </button> */}
           {onClose && (
-            <button 
-              onClick={onClose}
-              title="Close Chat"
-              type="button"
-              className="rounded-lg p-1.5 text-blue-100 transition-colors hover:bg-white/10 hover:text-white"
-            >
-              <X className="h-4 w-4" />
+            <button onClick={onClose} title="Close" type="button" style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              padding: '6px', borderRadius: '8px', color: '#bfdbfe',
+            }}>
+              <X style={{ width: '16px', height: '16px' }} />
             </button>
           )}
         </div>
       </div>
 
-      {/* Main Chat Area (FIXED: પાથ ડિપેન્ડન્સી વગરનું પ્યોર ઓટો-સ્ક્રોલ બોક્સ) */}
-      <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 custom-scrollbar">
+      {/* Messages — THIS is the scrollable area, flex: 1 + minHeight: 0 is the key */}
+      <div
+        style={{
+          flex: 1,
+          minHeight: 0,          /* CRITICAL — without this flex-1 won't scroll */
+          overflowY: 'auto',
+          overflowX: 'hidden',
+          padding: '12px 16px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px',
+        }}
+      >
         {messages.length === 0 ? (
-          <div className="flex min-h-[400px] flex-col items-center justify-center text-center px-2">
-            <div className="mb-3 rounded-full bg-blue-50 p-3 text-blue-500">
-              <Car className="h-8 w-8" />
+          <div style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textAlign: 'center',
+            padding: '16px',
+          }}>
+            <div style={{
+              marginBottom: '12px', padding: '12px',
+              borderRadius: '50%', backgroundColor: '#eff6ff',
+              color: '#d81d1d',
+            }}>
+              <Car style={{ width: '32px', height: '32px' }} />
             </div>
-            <p className="text-sm font-medium text-slate-700">Welcome to CarWash Express!</p>
-            <p className="mt-1 text-xs text-slate-400">Ask me anything about wash plans, pricing, or bookings.</p>
-            
-            {/* Suggestion Chips */}
-            <div className="mt-5 grid grid-cols-1 gap-2 w-full max-w-[280px]">
+            <p style={{ margin: 0, fontSize: '13px', fontWeight: 500, color: '#334155' }}>
+              Welcome to CarWash Express!
+            </p>
+            <p style={{ margin: '4px 0 0', fontSize: '11px', color: '#94a3b8' }}>
+              Ask me anything about wash plans, pricing, or bookings.
+            </p>
+            <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '8px', width: '100%', maxWidth: '280px' }}>
               {suggestions.map((text, idx) => (
                 <button
                   key={idx}
                   type="button"
                   onClick={() => sendMessage(text)}
-                  className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left text-xs font-medium text-slate-600 transition-all hover:border-blue-400 hover:bg-blue-50/50 hover:text-blue-600 shadow-sm"
+                  style={{
+                    background: 'white', border: '1px solid #e2e8f0',
+                    borderRadius: '12px', padding: '10px 12px',
+                    textAlign: 'left', fontSize: '11px', fontWeight: 500,
+                    color: '#475569', cursor: 'pointer',
+                    transition: 'all 0.15s',
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                  }}
                 >
                   {text}
                 </button>
@@ -111,45 +161,85 @@ export function ChatWindow({ onClose }) {
           </div>
         ) : (
           <>
-            {/* બધા મેસેજીસ અહીં લોડ થશે */}
             {messages.map((msg) => (
               <ChatBubble key={msg.id} message={msg} />
             ))}
-            
-            {/* Live Typing Effect Loader */}
+
             {isTyping && (
-              <div className="flex items-start gap-2.5">
-                <div className="flex max-w-[75%] items-center justify-center rounded-2xl bg-white px-4 py-3 text-slate-500 shadow-sm border border-slate-100">
-                  <span className="flex gap-1">
-                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-slate-400 [animation-delay:-0.3s]"></span>
-                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-slate-400 [animation-delay:-0.15s]"></span>
-                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-slate-400"></span>
-                  </span>
+              <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+                <div style={{
+                  background: 'white', border: '1px solid #f1f5f9',
+                  borderRadius: '16px', borderTopLeftRadius: '4px',
+                  padding: '10px 16px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                  display: 'flex', gap: '4px', alignItems: 'center',
+                }}>
+                  {['-0.3s', '-0.15s', '0s'].map((delay, i) => (
+                    <span key={i} style={{
+                      width: '6px', height: '6px', borderRadius: '50%',
+                      backgroundColor: '#94a3b8',
+                      display: 'inline-block',
+                      animation: `bounce 1.2s ease-in-out ${delay} infinite`,
+                    }} />
+                  ))}
                 </div>
               </div>
             )}
-            
-            {/* આ એન્કર ડિવાઇસ સ્ક્રોલિંગ ટાર્ગેટ છે */}
-            <div ref={scrollRef} />
+
+            {/* Scroll anchor — always rendered, always at bottom */}
+            <div ref={bottomRef} style={{ height: '1px', flexShrink: 0 }} />
           </>
         )}
       </div>
 
-      {/* Footer Chat Input Form */}
-      <form onSubmit={handleSend} className="border-t border-slate-200 bg-white p-3 flex items-center gap-2 z-10">
+      {/* Footer — fixed height, never shrinks */}
+      <form
+        onSubmit={handleSend}
+        style={{
+          flexShrink: 0,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '12px',
+          borderTop: '1px solid #e2e8f0',
+          backgroundColor: 'white',
+          zIndex: 10,
+        }}
+      >
         <input
           ref={inputRef}
           type="text"
           placeholder="Type your message..."
-          className="flex-1 rounded-xl bg-slate-100 px-4 py-2.5 text-xs text-slate-800 placeholder-slate-400 transition-all focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+          style={{
+            flex: 1,
+            borderRadius: '12px',
+            backgroundColor: '#f1f5f9',
+            border: 'none',
+            outline: 'none',
+            padding: '10px 16px',
+            fontSize: '12px',
+            color: '#1e293b',
+          }}
         />
         <button
           type="submit"
-          className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white shadow-md transition-all hover:bg-blue-700 active:scale-95 shrink-0"
+          style={{
+            width: '36px', height: '36px', flexShrink: 0,
+            borderRadius: '12px', backgroundColor: '#d81d1d',
+            border: 'none', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
+          }}
         >
-          <Send className="h-4 w-4" />
+          <Send style={{ width: '16px', height: '16px', color: 'white' }} />
         </button>
       </form>
+
+      <style>{`
+        @keyframes bounce {
+          0%, 60%, 100% { transform: translateY(0); }
+          30% { transform: translateY(-5px); }
+        }
+      `}</style>
     </div>
   )
 }

@@ -9,11 +9,11 @@ export default {
       },
       colors: {
         brand: {
-          50:  '#eff6ff',
-          100: '#dbeafe',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
+          50:  '#fff1ef',
+          100: '#fee0db',
+          500: '#f6413b',
+          600: '#eb3c25',
+          700: '#d81d1d',
         },
       },
       keyframes: {

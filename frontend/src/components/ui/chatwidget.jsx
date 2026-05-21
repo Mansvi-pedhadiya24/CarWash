@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { MessageSquare, X } from 'lucide-react'
 import { useValidate } from '@/hooks/useValidate'
-import { ChatWindow } from '@/components/chatwindow'
+import { ChatWindow } from '@/components/ChatWindow'
 
 export function ChatWidget() {
   const { isValid, isLoading } = useValidate()
