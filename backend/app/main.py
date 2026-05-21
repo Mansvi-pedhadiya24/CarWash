@@ -6,6 +6,7 @@ from app.db.session import engine      # DB engine
 
 from app.api.v1 import admin, validate
 from app.api.endpoints.chatbot import router as ws_router
+from app.api.endpoints import chatbot
 
 Base.metadata.create_all(bind=engine)
 
@@ -23,8 +24,7 @@ app.add_middleware(
 
 app.include_router(validate.router, prefix="/api/v1",       tags=["Validation"])
 app.include_router(admin.router,    prefix="/api/v1/admin", tags=["Admin"])
-
-app.include_router(ws_router)
+app.include_router(chatbot.router, prefix="", tags=["Chatbot"])
 
 
 @app.get("/", tags=["Health"])
