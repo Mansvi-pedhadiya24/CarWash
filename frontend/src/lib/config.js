@@ -1,9 +1,4 @@
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// config.js
-// Kaam: Backend API endpoints ane tokens manage કરવા માટે
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-const BASE_URL = "http://127.0.0.1:8000" 
+const BASE_URL = "http://127.0.0.1:8001" 
 
 export const API = {
   VALIDATE: `${BASE_URL}/api/v1/validate`,
@@ -12,5 +7,5 @@ export const API = {
 }
 
 export const CONFIG = {
-  TOKEN: "5d17c26d89afca2fb7c5e6a10465654d2c6fe0e300b3e198d516196307724643", 
+  TOKEN: "3e20174ec84cb3ac866ca08071b4ffec3ffa3f1cfa3dcf0b8fbac191334bc37e", 
 }

@@ -160,9 +160,10 @@
 #                 pass
 #         db.close()
 
+import asyncio
 import json
 from datetime import datetime
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, logger
 from sqlalchemy.orm import Session
 
 from app.db.session import SessionLocal
@@ -235,13 +236,19 @@ async def websocket_chat_endpoint(websocket: WebSocket):
             full_reply = ""
             ai_failed = False
 
+            # In your websocket_endpoint.py, update the streaming section:
             try:
                 async for chunk in stream_ai_reply(session=current_session, user_message=client_msg.message, db=db):
                     full_reply += chunk
                     await websocket.send_text(_frame("chunk", chunk))
+                    # Small yield to prevent event loop blocking
+                    await asyncio.sleep(0)
+                    
             except Exception as ai_err:
                 ai_failed = True
-                await websocket.send_text(_frame("error", f"AI Platform Error: {ai_err}"))
+                error_msg = f"AI Service Error: {str(ai_err)}"
+                logger.error(error_msg)
+                await websocket.send_text(_frame("error", error_msg))
 
             if not ai_failed:
                 await websocket.send_text(_frame("done"))

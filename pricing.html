@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Car Wash Pricing – Premium Packages</title>
+<style>
+  body {
+    margin: 0;
+    padding: 40px 20px;
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    background: #f0f4f8;
+    color: black;
+  }
+  .pdf-container {
+    max-width: 1000px;
+    margin: auto;
+    background: white;
+    border-radius: 32px;
+    padding: 40px;
+    box-shadow: 0 20px 35px -10px rgba(0,0,0,0.1);
+  }
+  h1 {
+    font-size: 36px;
+    margin: 0 0 8px 0;
+    color: #ca2222;
+    letter-spacing: -0.5px;
+  }
+  .tagline {
+    font-size: 18px;
+    color: #ab3131;
+    border-left: 4px solid #d42c2c;
+    padding-left: 16px;
+    margin: 20px 0 30px 0;
+  }
+  .pricing-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 30px 0;
+    border-radius: 24px;
+    overflow: hidden;
+  }
+  .pricing-table th {
+    background: #a41616;
+    color: white;
+    padding: 18px 12px;
+    font-weight: 600;
+    font-size: 18px;
+    text-align: left;
+  }
+  .pricing-table td {
+    padding: 15px 12px;
+    border-bottom: 1px solid #e2e8f0;
+    background: white;
+  }
+  .price {
+    font-weight: 800;
+    font-size: 22px;
+    color: #b21b1b;
+    letter-spacing: -0.3px;
+  }
+  .badge {
+    background: #eef2ff;
+    color: #9a0e0e;
+    padding: 4px 12px;
+    border-radius: 40px;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-block;
+  }
+  .footer-note {
+    margin-top: 35px;
+    padding-top: 20px;
+    border-top: 1px dashed #cbd5e1;
+    text-align: center;
+    font-size: 14px;
+    color: #4b5563;
+  }
+  .color-palette {
+    margin-top: 40px;
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 24px;
+  }
+  .color-row {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin: 15px 0;
+  }
+  .color-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: white;
+    padding: 8px 16px;
+    border-radius: 60px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 28px;
+  }
+</style>
+</head>
+<body>
+<div class="pdf-container">
+  <h1>🚗 Premium Car Wash</h1>
+  <div class="tagline">Gloss, care & protection — just drive in, drive out shining.</div>
+
+  <table class="pricing-table">
+    <thead>
+      <tr><th>Package</th><th>What's included</th><th>Price</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Express Wash</strong><br><span class="badge">Fast & eco</span></td><td>Exterior high-pressure rinse, foam bath, spot-free dry</td><td class="price">$15</td></tr>
+      <tr><td><strong>Standard Shine</strong></td><td>Express + wheel cleaning + tire shine + window polish</td><td class="price">$25</td></tr>
+      <tr><td><strong>Premium Detail</strong></td><td>Standard + interior vacuum, dashboard wipe, mat cleaning</td><td class="price">$40</td></tr>
+      <tr><td><strong>Ultimate Ceramic</strong></td><td>Premium + hand wax + ceramic spray + odor removal</td><td class="price">$70</td></tr>
+    </tbody>
+  </table>
+
+  <div style="background:#eef6fc; border-radius: 20px; padding: 18px; margin: 20px 0;">
+    <span style="font-weight:bold;">✨ Unlimited Plan</span> — $45/month · 1 wash/day · 20% off extras
+  </div>
+
+  <div class="footer-note">
+    📄 Prices valid until Dec 2026 · taxes extra if applicable · contact for fleet pricing<br>
+    Figma design consistency: minimalist cards + clear price hierarchy
+  </div>
+</div>
+</body>
+</html>

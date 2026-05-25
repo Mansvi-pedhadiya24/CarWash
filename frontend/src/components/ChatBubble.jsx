@@ -18,8 +18,8 @@ export function ChatBubble({ message }) {
       <div
         className={`max-w-[80%] rounded-2xl px-3.5 py-2.5 text-xs shadow-sm leading-relaxed ${
           isUser
-            ? 'bg-blue-600 text-white rounded-tr-none'
-            : 'bg-white text-slate-800 border border-slate-200/70 rounded-tl-none'
+            ? 'bg-red-600 text-white rounded-tr-none'
+            : 'bg-white text-slate-800 border border-slate-200/80 rounded-tl-none'
         }`}
       >
         {isUser ? (
