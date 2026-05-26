@@ -55,8 +55,6 @@ def is_booking_intent(message: str) -> bool:
     msg = message.lower().strip()
     return any(k in msg for k in keywords)
 
-
-# ─────────────────────────────────────────────────────────
 # FRESH STATE
 
 def fresh_state() -> dict:
@@ -162,7 +160,7 @@ def ask_service_msg() -> str:
         "2️⃣ **Premium Detail** — ₹799 | 90 min\n"
         "3️⃣ **Ceramic Coating** — ₹4999 | 4-5 hrs\n"
         "4️⃣ **Paint Protection (PPF)** — ₹2499 | 2-3 hrs\n\n"
-        "👉 Reply with 1, 2, 3, or 4"
+        "Reply with 1, 2, 3, or 4"
     )
 
 
@@ -174,7 +172,7 @@ def ask_location_msg(state: dict) -> str:
         "1️⃣ Kalawad Road Branch\n"
         "2️⃣ 150 Feet Ring Road Branch\n"
         "3️⃣ Gondal Road Branch\n\n"
-        "👉 Reply with 1, 2, or 3"
+        "Reply with 1, 2, or 3"
     )
 
 
@@ -187,7 +185,7 @@ def ask_vehicle_msg(state: dict) -> str:
         "2️⃣ Sedan (City, Verna, Dzire)\n"
         "3️⃣ SUV (Creta, Brezza, Fortuner)\n"
         "4️⃣ Luxury / Premium Car\n\n"
-        "👉 Reply with 1, 2, 3, or 4"
+        "Reply with 1, 2, 3, or 4"
     )
 
 
@@ -197,7 +195,7 @@ def ask_date_msg(state: dict) -> str:
         f"✅ **{veh}** selected!\n\n"
         "📅 **Preferred date?**\n"
         "We are open Mon–Sat, 9 AM – 6 PM.\n\n"
-        "👉 Example: *tomorrow*, *Saturday*, *25 May*"
+        "Example: *tomorrow*, *Saturday*, *25 May*"
     )
 
 
@@ -209,7 +207,7 @@ def ask_time_msg(state: dict) -> str:
         "3️⃣ 11:00 AM  4️⃣ 12:00 PM\n"
         "5️⃣ 2:00 PM   6️⃣ 3:00 PM\n"
         "7️⃣ 4:00 PM   8️⃣ 5:00 PM\n\n"
-        "👉 Reply with 1–8 or the time"
+        "Reply with 1–8 or the time"
     )
 
 
@@ -217,7 +215,7 @@ def ask_name_msg(state: dict) -> str:
     return (
         f"✅ Time: **{state['time']}** confirmed!\n\n"
         "👤 **Your full name please?**\n\n"
-        "👉 Example: *Raj Patel*"
+        "Example: *Raj Patel*"
     )
 
 
@@ -226,7 +224,7 @@ def ask_phone_msg(state: dict) -> str:
         f"✅ Hello **{state['name']}**!\n\n"
         "📱 **Your mobile number?**\n"
         "(For booking confirmation SMS)\n\n"
-        "👉 Example: *9876543210*"
+        "Example: *9876543210*"
     )
 
 
@@ -268,10 +266,7 @@ def invalid_msg(step: str) -> str:
 # MAIN BOOKING HANDLER — step machine
 
 def process_booking_step(session_uuid: str, user_message: str) -> str | None:
-    """
-    Returns a reply string if in booking flow, else None (→ use AI).
-    Maintains state in BOOKING_SESSIONS dict.
-    """
+    
     msg = user_message.strip()
 
     # ── Not in booking yet — check intent 
@@ -373,18 +368,13 @@ def _build_messages(session: ChatSession, user_message: str, db: Session) -> lis
         return [{"role": "user", "content": user_message}]
 
 
-# ─────────────────────────────────────────────────────────
 # MAIN ENTRY — called from chatbot.py websocket handler
-# ─────────────────────────────────────────────────────────
+
 async def stream_ai_reply(
     session: ChatSession,
     user_message: str,
     db: Session,
 ) -> AsyncGenerator[str, None]:
-    """
-    Main entry point for streaming AI replies.
-    Handles booking flow first, then falls back to Groq AI.
-    """
     session_uuid = session.session_uuid
 
     # 1. Try booking flow first

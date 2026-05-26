@@ -1,6 +1,3 @@
-"""
-Admin Endpoints — /api/v1/admin/*
-"""
 import secrets
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -12,21 +9,18 @@ from app.schemas.schemas import DomainCreate, DomainOut, TokenOut
 router = APIRouter()
 
 
-# ── DOMAIN ENDPOINTS ──────────────────────────────────────────────────────────
+# ── DOMAIN ENDPOINTS 
 
 @router.post("/domains", response_model=DomainOut, status_code=201)
 def create_domain(payload: DomainCreate, db: Session = Depends(get_db)):
-    """Navu domain register karo."""
     if db.query(Domain).filter(Domain.domain_name == payload.domain_name).first():
         raise HTTPException(status_code=400, detail="Domain already registered.")
 
-    # FIX 1: expires_at HAMESHA None — user set na kari shake
-    # FIX 2: is_active HAMESHA 1 — navi entry active j bane
     domain = Domain(
         domain_name=payload.domain_name,
         contact_email=payload.contact_email,
-        is_active=1,       # explicitly set — MySQL DEFAULT issue bypass
-        expires_at=None,   # explicitly set — kabhi expire na thay
+        is_active=1,       
+        expires_at=None,   
     )
     db.add(domain)
     db.commit()
@@ -36,7 +30,6 @@ def create_domain(payload: DomainCreate, db: Session = Depends(get_db)):
 
 @router.get("/domains", response_model=list[DomainOut])
 def list_domains(db: Session = Depends(get_db)):
-    """Badha registered domains list karo."""
     return db.query(Domain).order_by(Domain.created_at.desc()).all()
 
 
@@ -47,8 +40,6 @@ def toggle_domain(domain_id: int, db: Session = Depends(get_db)):
     if not domain:
         raise HTTPException(status_code=404, detail="Domain not found.")
 
-    # FIX 3: SmallInteger (0/1) comparison sahi rite karo
-    # is_active SmallInteger che — int() thi compare karo
     current = int(domain.is_active)
     domain.is_active = 1 
     db.commit()
@@ -62,11 +53,10 @@ def toggle_domain(domain_id: int, db: Session = Depends(get_db)):
     }
 
 
-# ── TOKEN ENDPOINTS ───────────────────────────────────────────────────────────
+# ── TOKEN ENDPOINTS 
 
 @router.post("/domains/{domain_id}/tokens", response_model=TokenOut, status_code=201)
 def generate_token(domain_id: int, db: Session = Depends(get_db)):
-    """Domain mate navo 64-char Bearer token generate karo."""
     if not db.query(Domain).filter(Domain.id == domain_id).first():
         raise HTTPException(status_code=404, detail="Domain not found.")
     token_row = DomainToken(
@@ -82,7 +72,6 @@ def generate_token(domain_id: int, db: Session = Depends(get_db)):
 
 @router.get("/domains/{domain_id}/tokens", response_model=list[TokenOut])
 def list_tokens(domain_id: int, db: Session = Depends(get_db)):
-    """Domain na badha tokens list karo."""
     return (
         db.query(DomainToken)
         .filter(DomainToken.domain_id == domain_id)
@@ -93,7 +82,7 @@ def list_tokens(domain_id: int, db: Session = Depends(get_db)):
 
 @router.delete("/tokens/{token_id}")
 def revoke_token(token_id: int, db: Session = Depends(get_db)):
-    """Token revoke karo — is_active=0."""
+    
     token_row = db.query(DomainToken).filter(DomainToken.id == token_id).first()
     if not token_row:
         raise HTTPException(status_code=404, detail="Token not found.")
@@ -102,11 +91,10 @@ def revoke_token(token_id: int, db: Session = Depends(get_db)):
     return {"message": "Token revoked.", "token_id": token_id}
 
 
-# ── USAGE STATS ───────────────────────────────────────────────────────────────
+# ── USAGE STATS 
 
 @router.get("/domains/{domain_id}/usage")
 def domain_usage(domain_id: int, db: Session = Depends(get_db)):
-    """Last 30 days stats for a domain."""
     if not db.query(Domain).filter(Domain.id == domain_id).first():
         raise HTTPException(status_code=404, detail="Domain not found.")
     logs = (
