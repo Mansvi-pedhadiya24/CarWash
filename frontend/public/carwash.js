@@ -9,7 +9,7 @@
     BACKEND_HTTP: scriptTag?.getAttribute('data-backend') || 'http://192.168.0.245:8001',
     BACKEND_WS:   scriptTag?.getAttribute('data-ws')     || '',
     TITLE:        scriptTag?.getAttribute('data-title')   || 'CarWash AI Support',
-    ACCENT:       scriptTag?.getAttribute('data-color')   || '#2563eb',
+    ACCENT:       scriptTag?.getAttribute('data-color')   || '#eb2525',
   };
   CONFIG.BACKEND_WS = CONFIG.BACKEND_WS || CONFIG.BACKEND_HTTP.replace('https://', 'wss://').replace('http://', 'ws://');
 
