@@ -4,14 +4,14 @@ from fastapi import HTTPException, status
 
 from app.models.chatbot_models import DomainToken, Domain, UsageLog
 
-LOCALHOST_ALIASES = {"localhost", "127.0.0.1", "0.0.0.0", "::1"}
+LOCALHOST_ALIASES = {"localhost", "127.0.0.1:8000", "0.0.0.0", "::1","127.0.0.1"}
 
 
 def _clean_origin(origin: str) -> str:
     """
     Origin string clean kare.
     "https://www.mycarwash.com:5173/page" → "mycarwash.com"
-    "127.0.0.1:8000" → "127.0.0.1"
+    "127.0.0.1:8001" → "127.0.0.1"
     "localhost:3000" → "localhost"
     """
     cleaned = (

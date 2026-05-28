@@ -5,7 +5,7 @@
   // ── Config from script tag attributes ────────────────────────
   const scriptTag = document.currentScript || document.querySelector('script[data-token]');
   const CONFIG = {
-    TOKEN:       scriptTag?.getAttribute('data-token')   || 'devtoken00000000000000000000000000000000000000000000000000000001',
+    TOKEN:       scriptTag?.getAttribute('data-token')   || 'b737e5eb0768c62006fe11df67646a087dcaae250c97ec0809e47a6eb7a184f2',
     BACKEND_HTTP: scriptTag?.getAttribute('data-backend') || 'http://192.168.0.245:8001',
     BACKEND_WS:   scriptTag?.getAttribute('data-ws')     || '',
     TITLE:        scriptTag?.getAttribute('data-title')   || 'CarWash AI Support',
