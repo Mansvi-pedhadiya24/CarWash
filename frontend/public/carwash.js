@@ -203,7 +203,7 @@
           <h4>Welcome to ${CONFIG.TITLE}!</h4>
           <p>Ask me about wash plans, pricing, or bookings.</p>
           <div id="__cw_chips">
-            <button class="cw-chip" data-msg="🏎️ Full Body Wash Price?">🏎️ Full Body Wash Price?</button>
+            <button class="cw-chip" data-msg="🏎️ Full car Wash Price?">🏎️ Full Body Wash Price?</button>
             <button class="cw-chip" data-msg="📅 Book an Appointment">📅 Book an Appointment</button>
             <button class="cw-chip" data-msg="✨ Ceramic Coating Details">✨ Ceramic Coating Details</button>
             <button class="cw-chip" data-msg="📍 Where is your workshop?">📍 Where is your workshop?</button>
