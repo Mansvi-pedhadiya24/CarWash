@@ -10,10 +10,11 @@ LOCALHOST_ALIASES = {
     "127.0.0.1",
     "0.0.0.0",
     "::1",
-    "192.168.0.245",   # your local network IP
-    "192.168.0.199",   # add any other local IPs here
+    "", 
+    "null",   
+    "192.168.0.245",
+    "192.168.0.199",
 }
-
 
 def _clean_origin(origin: str) -> str:
     """

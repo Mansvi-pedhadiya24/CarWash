@@ -3,36 +3,44 @@
  * Usage: <script src="carwash-chatbot.js" data-token="YOUR_TOKEN" data-backend="http://127.0.0.1:8000"></script>
  */
 (function () {
-  'use strict';
+  "use strict";
 
   // ── Config ─────────────────────────────────────────────────────────────────
-  const currentScript = document.currentScript || (function () {
-    const scripts = document.getElementsByTagName('script');
-    return scripts[scripts.length - 1];
-  })();
+  const currentScript =
+    document.currentScript ||
+    (function () {
+      const scripts = document.getElementsByTagName("script");
+      return scripts[scripts.length - 1];
+    })();
 
-  const BACKEND_HTTP = currentScript.getAttribute('data-backend') || 'http://127.0.0.1:8000';
-  const BACKEND_WS   = BACKEND_HTTP.replace(/^http/, 'ws');
-  const TOKEN        = currentScript.getAttribute('data-token') || '2dc195b422d3cc701abc15decccf8a0e07094cc788f25507b7169164113ed1f2';
+  const BACKEND_HTTP =
+    currentScript.getAttribute("data-backend") || "http://127.0.0.1:8000";
+  const BACKEND_WS = BACKEND_HTTP.replace(/^http/, "ws");
+  const TOKEN =
+    currentScript.getAttribute("data-token") ||
+    "2dc195b422d3cc701abc15decccf8a0e07094cc788f25507b7169164113ed1f2";
 
   const API = {
     VALIDATE: `${BACKEND_HTTP}/api/v1/validate`,
-    WS_CHAT:  `${BACKEND_WS}/api/v1/ws/chat`,
+    WS_CHAT: `${BACKEND_WS}/api/v1/ws/chat`,
   };
 
   // ── UUID ───────────────────────────────────────────────────────────────────
   function generateUUID() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-      const r = (Math.random() * 16) | 0;
-      const v = c === 'x' ? r : (r & 0x3) | 0x8;
-      return v.toString(16);
-    });
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+      /[xy]/g,
+      function (c) {
+        const r = (Math.random() * 16) | 0;
+        const v = c === "x" ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+      },
+    );
   }
 
   const SESSION_UUID = generateUUID();
 
   // ── Inject Styles ──────────────────────────────────────────────────────────
-  const style = document.createElement('style');
+  const style = document.createElement("style");
   style.textContent = `
     #cw-chatbot-root * {
       box-sizing: border-box;
@@ -383,15 +391,15 @@
   const icons = {
     car: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v3"/><rect x="14" y="11" width="8" height="10" rx="1"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>`,
     msg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`,
-    x:   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
+    x: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
     trash: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>`,
     wifioff: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.56 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>`,
     send: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`,
   };
 
   // ── Build DOM ──────────────────────────────────────────────────────────────
-  const root = document.createElement('div');
-  root.id = 'cw-chatbot-root';
+  const root = document.createElement("div");
+  root.id = "cw-chatbot-root";
 
   root.innerHTML = `
     <!-- Chat Window -->
@@ -449,96 +457,106 @@
   document.body.appendChild(root);
 
   // ── Element Refs ───────────────────────────────────────────────────────────
-  const win        = document.getElementById('cw-window');
-  const fab        = document.getElementById('cw-fab');
-  const fabIcon    = document.getElementById('cw-fab-icon');
-  const fabBadge   = document.getElementById('cw-fab-badge');
-  const msgArea    = document.getElementById('cw-messages');
-  const emptyState = document.getElementById('cw-empty');
-  const inputEl    = document.getElementById('cw-input');
-  const sendBtn    = document.getElementById('cw-send');
-  const clearBtn   = document.getElementById('cw-clear-btn');
-  const closeBtn   = document.getElementById('cw-close-btn');
-  const statusEl   = document.getElementById('cw-status');
-  const statusText = document.getElementById('cw-status-text');
+  const win = document.getElementById("cw-window");
+  const fab = document.getElementById("cw-fab");
+  const fabIcon = document.getElementById("cw-fab-icon");
+  const fabBadge = document.getElementById("cw-fab-badge");
+  const msgArea = document.getElementById("cw-messages");
+  const emptyState = document.getElementById("cw-empty");
+  const inputEl = document.getElementById("cw-input");
+  const sendBtn = document.getElementById("cw-send");
+  const clearBtn = document.getElementById("cw-clear-btn");
+  const closeBtn = document.getElementById("cw-close-btn");
+  const statusEl = document.getElementById("cw-status");
+  const statusText = document.getElementById("cw-status-text");
 
   // ── State ──────────────────────────────────────────────────────────────────
-  let isOpen         = false;
-  let isConnected    = false;
-  let isTyping       = false;
-  let messages       = [];
-  let streamingId    = null;
-  let ws             = null;
+  let isOpen = false;
+  let isConnected = false;
+  let isTyping = false;
+  let messages = [];
+  let streamingId = null;
+  let ws = null;
   let reconnectTimer = null;
 
   // ── Toggle Open/Close ──────────────────────────────────────────────────────
   function openChat() {
     isOpen = true;
-    win.classList.remove('cw-hidden');
-    win.classList.add('cw-visible');
+    win.classList.remove("cw-hidden");
+    win.classList.add("cw-visible");
     fabIcon.innerHTML = icons.x;
-    fabBadge.style.display = 'none';
+    fabBadge.style.display = "none";
     inputEl.focus();
   }
 
   function closeChat() {
     isOpen = false;
-    win.classList.remove('cw-visible');
-    win.classList.add('cw-hidden');
+    win.classList.remove("cw-visible");
+    win.classList.add("cw-hidden");
     fabIcon.innerHTML = icons.msg;
   }
 
-  fab.addEventListener('click', function () {
+  fab.addEventListener("click", function () {
     isOpen ? closeChat() : openChat();
   });
-  closeBtn.addEventListener('click', closeChat);
+  closeBtn.addEventListener("click", closeChat);
 
   // ── Render Messages ────────────────────────────────────────────────────────
   function renderMessages() {
     if (messages.length === 0) {
-      emptyState.style.display = 'flex';
+      emptyState.style.display = "flex";
       // remove all bubble rows
-      Array.from(msgArea.querySelectorAll('.cw-bubble-row, #cw-typing')).forEach(function (el) { el.remove(); });
+      Array.from(
+        msgArea.querySelectorAll(".cw-bubble-row, #cw-typing"),
+      ).forEach(function (el) {
+        el.remove();
+      });
       return;
     }
-    emptyState.style.display = 'none';
+    emptyState.style.display = "none";
 
     // Sync DOM with messages array
     messages.forEach(function (msg) {
       let el = msgArea.querySelector('[data-msg-id="' + msg.id + '"]');
       if (!el) {
-        el = document.createElement('div');
-        el.className = 'cw-bubble-row ' + msg.role;
-        el.setAttribute('data-msg-id', msg.id);
-        const bubble = document.createElement('div');
-        bubble.className = 'cw-bubble ' + msg.role;
+        el = document.createElement("div");
+        el.className = "cw-bubble-row " + msg.role;
+        el.setAttribute("data-msg-id", msg.id);
+        const bubble = document.createElement("div");
+        bubble.className = "cw-bubble " + msg.role;
         el.appendChild(bubble);
         // Insert before typing indicator if present, else append
-        const typingEl = document.getElementById('cw-typing');
+        const typingEl = document.getElementById("cw-typing");
         if (typingEl) msgArea.insertBefore(el, typingEl);
         else msgArea.appendChild(el);
       }
-      const bubble = el.querySelector('.cw-bubble');
+      const bubble = el.querySelector(".cw-bubble");
       if (bubble) bubble.textContent = msg.content;
     });
 
     // Remove stale message elements
-    Array.from(msgArea.querySelectorAll('.cw-bubble-row')).forEach(function (el) {
-      const id = el.getAttribute('data-msg-id');
-      if (!messages.find(function (m) { return m.id === id; })) {
-        el.remove();
-      }
-    });
+    Array.from(msgArea.querySelectorAll(".cw-bubble-row")).forEach(
+      function (el) {
+        const id = el.getAttribute("data-msg-id");
+        if (
+          !messages.find(function (m) {
+            return m.id === id;
+          })
+        ) {
+          el.remove();
+        }
+      },
+    );
 
     scrollToBottom();
   }
 
   function setTyping(val) {
     isTyping = val;
-    let typingEl = document.getElementById('cw-typing');
+    let typingEl = document.getElementById("cw-typing");
     if (val && !typingEl) {
-      typingEl = document.createElement('div');
-      typingEl.id = 'cw-typing';
+      typingEl = document.createElement("div");
+      typingEl.id = "cw-typing";
       typingEl.innerHTML = `<div id="cw-typing-dots"><span class="cw-dot"></span><span class="cw-dot"></span><span class="cw-dot"></span></div>`;
       msgArea.appendChild(typingEl);
       scrollToBottom();
@@ -552,7 +570,7 @@
   }
 
   // ── Clear ──────────────────────────────────────────────────────────────────
-  clearBtn.addEventListener('click', function () {
+  clearBtn.addEventListener("click", function () {
     messages = [];
     streamingId = null;
     setTyping(false);
@@ -560,8 +578,8 @@
   });
 
   // ── Suggestion Chips ───────────────────────────────────────────────────────
-  document.querySelectorAll('.cw-suggestion-btn').forEach(function (btn) {
-    btn.addEventListener('click', function () {
+  document.querySelectorAll(".cw-suggestion-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
       sendMessage(btn.textContent);
     });
   });
@@ -570,12 +588,12 @@
   function setConnected(val) {
     isConnected = val;
     if (val) {
-      statusEl.classList.remove('offline');
-      statusText.textContent = 'Online Agent';
-      statusEl.querySelector('.cw-dot-wrap').style.display = '';
+      statusEl.classList.remove("offline");
+      statusText.textContent = "Online Agent";
+      statusEl.querySelector(".cw-dot-wrap").style.display = "";
     } else {
-      statusEl.classList.add('offline');
-      statusEl.querySelector('.cw-dot-wrap').style.display = 'none';
+      statusEl.classList.add("offline");
+      statusEl.querySelector(".cw-dot-wrap").style.display = "none";
       statusText.innerHTML = `${icons.wifioff} Reconnecting...`;
     }
   }
@@ -606,28 +624,42 @@
       try {
         var frame = JSON.parse(event.data);
 
-        if (frame.type === 'chunk') {
+        if (frame.type === "chunk") {
           messages = messages.map(function (msg) {
             if (msg.id === streamingId) {
-              return { id: msg.id, role: msg.role, content: msg.content + frame.data, isStreaming: true };
+              return {
+                id: msg.id,
+                role: msg.role,
+                content: msg.content + frame.data,
+                isStreaming: true,
+              };
             }
             return msg;
           });
           renderMessages();
-        } else if (frame.type === 'done') {
+        } else if (frame.type === "done") {
           messages = messages.map(function (msg) {
             if (msg.id === streamingId) {
-              return { id: msg.id, role: msg.role, content: msg.content, isStreaming: false };
+              return {
+                id: msg.id,
+                role: msg.role,
+                content: msg.content,
+                isStreaming: false,
+              };
             }
             return msg;
           });
           streamingId = null;
           setTyping(false);
           renderMessages();
-        } else if (frame.type === 'error') {
+        } else if (frame.type === "error") {
           streamingId = null;
           setTyping(false);
-          messages.push({ id: 'err-' + Date.now(), role: 'assistant', content: '⚠️ ' + frame.data });
+          messages.push({
+            id: "err-" + Date.now(),
+            role: "assistant",
+            content: "⚠️ " + frame.data,
+          });
           renderMessages();
         }
       } catch (e) {
@@ -638,35 +670,50 @@
 
   // ── Send Message ───────────────────────────────────────────────────────────
   function sendMessage(text) {
-    var trimmed = (text || '').trim();
+    var trimmed = (text || "").trim();
     if (!trimmed) return;
 
-    var userMsg = { id: 'u-' + Date.now() + '-' + Math.random().toString(36).slice(2), role: 'user', content: trimmed };
+    var userMsg = {
+      id: "u-" + Date.now() + "-" + Math.random().toString(36).slice(2),
+      role: "user",
+      content: trimmed,
+    };
     messages.push(userMsg);
 
-    var aiId = 'a-' + Date.now() + '-' + Math.random().toString(36).slice(2);
+    var aiId = "a-" + Date.now() + "-" + Math.random().toString(36).slice(2);
     streamingId = aiId;
-    messages.push({ id: aiId, role: 'assistant', content: '', isStreaming: true });
+    messages.push({
+      id: aiId,
+      role: "assistant",
+      content: "",
+      isStreaming: true,
+    });
     setTyping(true);
     renderMessages();
 
     if (!ws || ws.readyState !== WebSocket.OPEN) {
       connect();
-      setTimeout(function () { sendMessage(text); }, 1000);
+      setTimeout(function () {
+        sendMessage(text);
+      }, 1000);
       // remove the optimistic messages we just added since we'll retry
-      messages = messages.filter(function (m) { return m.id !== userMsg.id && m.id !== aiId; });
+      messages = messages.filter(function (m) {
+        return m.id !== userMsg.id && m.id !== aiId;
+      });
       streamingId = null;
       setTyping(false);
       renderMessages();
       return;
     }
 
-    ws.send(JSON.stringify({
-      token:        TOKEN,
-      origin:       window.location.hostname,
-      session_uuid: SESSION_UUID,
-      message:      trimmed,
-    }));
+    ws.send(
+      JSON.stringify({
+        token: TOKEN,
+        origin: window.location.hostname || "localhost", // ← fix
+        session_uuid: SESSION_UUID,
+        message: trimmed,
+      }),
+    );
   }
 
   // ── Input & Send ───────────────────────────────────────────────────────────
@@ -674,42 +721,48 @@
     var text = inputEl.value;
     if (!text.trim()) return;
     sendMessage(text);
-    inputEl.value = '';
+    inputEl.value = "";
   }
 
-  sendBtn.addEventListener('click', handleSend);
-  inputEl.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter' && !e.shiftKey) {
+  sendBtn.addEventListener("click", handleSend);
+  inputEl.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     }
   });
 
   // ── Validate & Boot ────────────────────────────────────────────────────────
+  // ── Validate & Boot ────────────────────────────────────────────────────────
   (function init() {
-    fetch(API.VALIDATE, {
-      method: 'POST',
-      headers: {
-        'Content-Type':  'application/json',
-        'Authorization': 'Bearer ' + TOKEN,
-      },
-      body: JSON.stringify({ origin: window.location.hostname }),
-    })
-    .then(function (res) {
-      if (res.ok) {
-        root.style.display = '';
-        connect();
-      } else {
-        console.warn('[CarWash Chatbot] Token/domain invalid — widget hidden');
-        root.style.display = 'none';
-      }
-    })
-    .catch(function () {
-      // Dev fallback — show anyway if backend unreachable
-      console.warn('[CarWash Chatbot] Backend unreachable — showing in dev mode');
-      root.style.display = '';
-      connect();
-    });
-  })();
+    // file:// thi open hoy to hostname "" aave — localhost use karo
+    var origin = window.location.hostname || "localhost";
 
+    fetch(API.VALIDATE, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + TOKEN,
+      },
+      body: JSON.stringify({ origin: origin }), // ← changed
+    })
+      .then(function (res) {
+        if (res.ok) {
+          root.style.display = "";
+          connect();
+        } else {
+          console.warn(
+            "[CarWash Chatbot] Token/domain invalid — widget hidden",
+          );
+          root.style.display = "none";
+        }
+      })
+      .catch(function () {
+        console.warn(
+          "[CarWash Chatbot] Backend unreachable — showing in dev mode",
+        );
+        root.style.display = "";
+        connect();
+      });
+  })();
 })();
