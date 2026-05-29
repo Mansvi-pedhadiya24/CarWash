@@ -4,7 +4,7 @@ from fastapi import HTTPException, status
 
 from app.models.chatbot_models import DomainToken, Domain, UsageLog
 
-LOCALHOST_ALIASES = {"localhost", "127.0.0.1:8000", "0.0.0.0", "::1","127.0.0.1:8001","192.168.0.199:9001"}
+LOCALHOST_ALIASES = {"localhost", "127.0.0.1:8000", "0.0.0.0", "::1","127.0.0.1:8001","192.168.0.199:9001","192.168.0.245"}
 
 
 def _clean_origin(origin: str) -> str:

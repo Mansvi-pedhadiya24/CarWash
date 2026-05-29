@@ -4,7 +4,7 @@
   // ── Config from script tag attributes ────────────────────────
   const scriptTag = document.currentScript || document.querySelector('script[data-token]');
   const CONFIG = {
-    TOKEN:        scriptTag?.getAttribute('data-token')   || 'b737e5eb0768c62006fe11df67646a087dcaae250c97ec0809e47a6eb7a184f2',
+    TOKEN:        scriptTag?.getAttribute('data-token')   || '52a99694e4e521f8e394d0424ba7c547c1040582e331ebd7c40ce35bb3fce4ef',
     BACKEND_HTTP: scriptTag?.getAttribute('data-backend') || 'http://192.168.0.245:8000',
     BACKEND_WS:   scriptTag?.getAttribute('data-ws')     || '',
     TITLE:        scriptTag?.getAttribute('data-title')   || 'CarWash AI Support',
@@ -320,7 +320,7 @@
 }
 
 /* ─────────────────────────
-   BUBBLES (ઓરિજિનલ પર્ફેક્ટ સેન્ટર લુક)
+   BUBBLES 
 ───────────────────────── */
 .cw-bubble-wrap{
   display:flex;
@@ -598,7 +598,7 @@
   }
   clearBtn.addEventListener('click', clearChat);
 
-  // ── AI મોડેલના <think> ટેગ રીમૂવ કરવા ──────────────────────────
+  // ── AI <think> 
   function cleanContent(text) {
     return text
       .replace(/<think>[\s\S]*?<\/think>/gi, '')
@@ -606,7 +606,7 @@
       .trim();
   }
 
-  // ── Render ────────────────────────────────────────────────────
+  // ── Render 
   function scrollToBottom() {
     setTimeout(() => { msgBox.scrollTop = msgBox.scrollHeight; }, 50);
   }
@@ -629,7 +629,6 @@
       const content = isUser ? msg.content : cleanContent(msg.content);
       if (!content && !isUser) return;
 
-      // માર્કડાઉન કન્વર્ઝન (લાઈન બ્રેક અને બોલ્ડ સપોર્ટ સાથે ઓરિજિનલ ડિઝાઇન)
       const formattedContent = isUser ? escapeHtml(content) : parseBotMarkdown(content);
 
       html += `
