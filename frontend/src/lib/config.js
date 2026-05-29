@@ -1,4 +1,4 @@
-const BASE_URL = "http://127.0.0.1:8000" 
+const BASE_URL = "http://192.168.0.245:8000" 
 
 export const API = {
   VALIDATE: `${BASE_URL}/api/v1/validate`,
@@ -7,5 +7,5 @@ export const API = {
 }
 
 export const CONFIG = {
-  TOKEN: "9afe0ac059e22be923d923c818c3b0c48e0a2aa2413a99a6ff8e0a99f5634f24", 
+  TOKEN: "6bee2eddbd0f8cd6492d96346c00494b76a856fe07d5b9a8d5bc1065a05cd873", 
 }
