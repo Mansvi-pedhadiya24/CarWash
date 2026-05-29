@@ -11,8 +11,8 @@
     ACCENT:       scriptTag?.getAttribute('data-color')   || '#eb2525',
   };
 
-  // HTTPS અને HTTP બંને માટે ડાયનેમિક સપોર્ટ (Live Production URL માટે)
-  CONFIG.BACKEND_WS = CONFIG.BACKEND_WS || CONFIG.BACKEND_HTTP.replace(/^https:\/\//i, 'wss://').replace(/^http:\/\//i, 'ws://');
+  // Live Server અને Production માટે ઓટોમેટિક પ્રોટોકોલ કન્વર્ઝન
+  CONFIG.BACKEND_WS = CONFIG.BACKEND_WS || CONFIG.BACKEND_HTTP.replace('https://', 'wss://').replace('http://', 'ws://');
 
   const API = {
     VALIDATE: `${CONFIG.BACKEND_HTTP}/api/v1/validate`,
@@ -31,7 +31,7 @@
   }
   const SESSION_UUID = uuid();
 
-  // ── Inject Styles ─────────────────────────────────────────────
+  // ── Inject Styles (ઓરિજિનલ CSS સ્ક્રીનશોટ્સ મુજબ) ──────────────────
   const accent = CONFIG.ACCENT;
   const styles = `
 #__cw_chatbot_root *{
@@ -54,7 +54,6 @@
 /* ─────────────────────────
    FAB BUTTON
 ───────────────────────── */
-
 #__cw_fab{
   width:64px;
   height:64px;
@@ -102,7 +101,6 @@
 /* ─────────────────────────
    WINDOW
 ───────────────────────── */
-
 #__cw_window{
   width:390px;
   height:610px;
@@ -130,7 +128,6 @@
 /* ─────────────────────────
    HEADER
 ───────────────────────── */
-
 #__cw_header{
   background:linear-gradient(135deg,#ff1d1d,#e00000);
   color:white;
@@ -223,7 +220,6 @@
 /* ─────────────────────────
    MESSAGES AREA
 ───────────────────────── */
-
 #__cw_messages{
   flex:1;
   overflow-y:auto;
@@ -246,7 +242,6 @@
 /* ─────────────────────────
    EMPTY SECTION
 ───────────────────────── */
-
 #__cw_empty{
   display:flex;
   flex-direction:column;
@@ -291,9 +286,8 @@
 }
 
 /* ─────────────────────────
-   QUICK BUTTONS
+   QUICK CHIPS BUTTONS
 ───────────────────────── */
-
 #__cw_chips{
   width:100%;
   max-width:300px;
@@ -326,9 +320,8 @@
 }
 
 /* ─────────────────────────
-   BUBBLES WITH CUSTOM RE-STYLING FOR MARKDOWN
+   BUBBLES (ઓરિજિનલ પર્ફેક્ટ સેન્ટર લુક)
 ───────────────────────── */
-
 .cw-bubble-wrap{
   display:flex;
   gap:10px;
@@ -355,27 +348,34 @@
   box-shadow:0 10px 20px rgba(255,0,0,.15);
 }
 
+/* ઓરિજિનલ વ્હાઇટ બોક્સ કાર્ડ લુક ફોર બોટ */
 .cw-bubble.bot{
   background:white;
   color:#0f172a;
   border:1px solid #e2e8f0;
   border-top-left-radius:6px;
   box-shadow:0 4px 10px rgba(15,23,42,.04);
+  text-align: center; /* સ્ક્રીનશોટ મુજબ સેન્ટર અલાઈનમેન્ટ */
 }
 
-/* બોટના લાઈવ ફોર્મેટિંગ (SS પ્રીમિયમ લુક) માટેની આંતરિક સ્ટાઈલ */
-.cw-bubble.bot p { margin-bottom: 6px; }
-.cw-bubble.bot p:last-child { margin-bottom: 0; }
-.cw-bubble.bot ul { list-style-type: disc; padding-left: 20px; margin: 6px 0; }
-.cw-bubble.bot ol { list-style-type: decimal; padding-left: 20px; margin: 6px 0; }
-.cw-bubble.bot li { font-size: 13.5px; margin-bottom: 4px; line-height: 1.6; }
-.cw-bubble.bot strong { font-weight: 700; color: #0f172a; }
-.cw-bubble.bot em { font-style: italic; }
+/* લિસ્ટ આઈટમ્સ અને બોલ્ડ ટેક્સ્ટ નું ફોર્મેટિંગ વ્યવસ્થિત રાખવા */
+.cw-line {
+  display: block;
+  margin-bottom: 4px;
+}
+.cw-line:last-child {
+  margin-bottom: 0;
+}
+.cw-bubble.bot strong {
+  font-weight: 700;
+}
+.cw-bubble.bot em {
+  font-style: italic;
+}
 
 /* ─────────────────────────
    TYPING
 ───────────────────────── */
-
 .cw-typing{
   padding:12px 14px;
   border-radius:16px;
@@ -411,7 +411,6 @@
 /* ─────────────────────────
    FOOTER
 ───────────────────────── */
-
 #__cw_footer{
   padding:14px;
   background:white;
@@ -471,7 +470,6 @@
 /* ─────────────────────────
    ANIMATION
 ───────────────────────── */
-
 @keyframes cwSlide{
   from{ opacity:0; transform:translateY(8px); }
   to{ opacity:1; transform:translateY(0); }
@@ -480,7 +478,6 @@
 /* ─────────────────────────
    MOBILE
 ───────────────────────── */
-
 @media(max-width:440px){
   #__cw_chatbot_root{
     right:12px;
@@ -601,16 +598,7 @@
   }
   clearBtn.addEventListener('click', clearChat);
 
-  // ── Chips Suggestion Click Handler ────────────────────────────
-  function handleSuggestionClick(text) {
-    if (text.includes("Full car Wash Price")) {
-      window.open('/CarWash_Pricing.pdf', '_blank');
-      return;
-    }
-    sendMessage(text);
-  }
-
-  // ── AI મોડેલના <think> ટેગ કાઢવા માટેનું ક્લીનર ──────────────────
+  // ── AI મોડેલના <think> ટેગ રીમૂવ કરવા ──────────────────────────
   function cleanContent(text) {
     return text
       .replace(/<think>[\s\S]*?<\/think>/gi, '')
@@ -627,7 +615,7 @@
     if (messages.length === 0) {
       msgBox.innerHTML = emptyState.outerHTML;
       root.querySelectorAll('.cw-chip').forEach(btn => {
-        btn.addEventListener('click', () => handleSuggestionClick(btn.dataset.msg));
+        btn.addEventListener('click', () => sendMessage(btn.dataset.msg));
       });
       return;
     }
@@ -638,12 +626,11 @@
       const bubbleClass = isUser ? 'user' : 'bot';
       const wrapClass = isUser ? 'user' : '';
       
-      // બોટના મેસેજ માટે થિંક બ્લોક રીમૂવ કરવો
       const content = isUser ? msg.content : cleanContent(msg.content);
       if (!content && !isUser) return;
 
-      // યુઝરના ટેક્સ્ટ પ્લેઈન રાખવા અને બોટ માટે એડવાન્સ માર્કડાઉન રેન્ડરર ચલાવવું
-      const formattedContent = isUser ? escapeHtml(content) : parseMarkdown(content);
+      // માર્કડાઉન કન્વર્ઝન (લાઈન બ્રેક અને બોલ્ડ સપોર્ટ સાથે ઓરિજિનલ ડિઝાઇન)
+      const formattedContent = isUser ? escapeHtml(content) : parseBotMarkdown(content);
 
       html += `
         <div class="cw-bubble-wrap ${wrapClass} cw-slide-in">
@@ -671,39 +658,22 @@
       .replace(/\n/g, '<br>');
   }
 
-  // ── SS સ્ટાઈલ મુજબનું પ્રીમિયમ માર્કડાઉન એન્જિન ──────────────────
-  function parseMarkdown(text) {
-    let html = text;
+  // ── ઓરિજિનલ સેન્ટર ડિઝાઇન જાળવી રાખીને ટેક્સ્ટ ફોર્મેટિંગ એન્જિન ──
+  function parseBotMarkdown(text) {
     // **બોલ્ડ** ટેક્સ્ટ કન્વર્ટ કરવા
-    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    let html = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     // *ઈટાલિક* ટેક્સ્ટ કન્વર્ટ કરવા
     html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
     
+    // દરેક નવી લાઈનને ઓરિજિનલ સ્ટાઈલમાં રેન્ડર કરવા માટે સ્પ્લિટ કરો
     let lines = html.split('\n');
-    let inUl = false, inOl = false;
-    let processedLines = [];
-
-    lines.forEach(line => {
+    let processedLines = lines.map(line => {
       let trimmed = line.trim();
-      if (trimmed.startsWith('* ') || trimmed.startsWith('- ')) {
-        if (!inUl) { processedLines.push('<ul>'); inUl = true; }
-        processedLines.push(`<li>${trimmed.substring(2)}</li>`);
-      } else if (/^\d+\.\s/.test(trimmed)) {
-        if (!inOl) { processedLines.push('<ol>'); inOl = true; }
-        let rawContent = trimmed.replace(/^\d+\.\s/, '');
-        processedLines.push(`<li>${rawContent}</li>`);
-      } else {
-        if (inUl) { processedLines.push('</ul>'); inUl = false; }
-        if (inOl) { processedLines.push('</ol>'); inOl = false; }
-        if (trimmed) {
-          processedLines.push(`<p>${line}</p>`);
-        }
-      }
+      if (!trimmed) return ''; // ખાલી લાઇન હોય તો સ્કીપ કરો
+      return `<span class="cw-line">${line}</span>`;
     });
-    if (inUl) processedLines.push('</ul>');
-    if (inOl) processedLines.push('</ol>');
 
-    return processedLines.join('');
+    return processedLines.filter(l => l !== '').join('');
   }
 
   // ── WebSocket ─────────────────────────────────────────────────
@@ -822,7 +792,7 @@
 
   // Attach Initial Chip Listeners
   root.querySelectorAll('.cw-chip').forEach(btn => {
-    btn.addEventListener('click', () => handleSuggestionClick(btn.dataset.msg));
+    btn.addEventListener('click', () => sendMessage(btn.dataset.msg));
   });
 
   // ── Validate token & init connection ──────────────────────────
