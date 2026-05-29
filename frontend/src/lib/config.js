@@ -7,5 +7,5 @@ export const API = {
 }
 
 export const CONFIG = {
-  TOKEN: "6bee2eddbd0f8cd6492d96346c00494b76a856fe07d5b9a8d5bc1065a05cd873", 
+  TOKEN: "2dc195b422d3cc701abc15decccf8a0e07094cc788f25507b7169164113ed1f2", 
 }

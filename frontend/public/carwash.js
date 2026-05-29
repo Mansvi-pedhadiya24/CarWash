@@ -13,7 +13,7 @@
 
   const BACKEND_HTTP = currentScript.getAttribute('data-backend') || 'http://127.0.0.1:8000';
   const BACKEND_WS   = BACKEND_HTTP.replace(/^http/, 'ws');
-  const TOKEN        = currentScript.getAttribute('data-token') || 'devtoken00000000000000000000000000000000000000000000000000000001';
+  const TOKEN        = currentScript.getAttribute('data-token') || '2dc195b422d3cc701abc15decccf8a0e07094cc788f25507b7169164113ed1f2';
 
   const API = {
     VALIDATE: `${BACKEND_HTTP}/api/v1/validate`,
