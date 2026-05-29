@@ -4,40 +4,48 @@ from fastapi import HTTPException, status
 
 from app.models.chatbot_models import DomainToken, Domain, UsageLog
 
-LOCALHOST_ALIASES = {"localhost", "127.0.0.1:8000", "0.0.0.0", "::1","127.0.0.1:8001","192.168.0.199:9001","192.168.0.245"}
+# These all normalize to "localhost"
+LOCALHOST_ALIASES = {
+    "localhost",
+    "127.0.0.1",
+    "0.0.0.0",
+    "::1",
+    "192.168.0.245",   # your local network IP
+    "192.168.0.199",   # add any other local IPs here
+}
 
 
 def _clean_origin(origin: str) -> str:
     """
-    Origin string clean kare.
+    Strip scheme, port, path — return bare hostname/IP only.
     "https://www.mycarwash.com:5173/page" → "mycarwash.com"
-    "127.0.0.1:8001" → "127.0.0.1"
-    "localhost:3000" → "localhost"
+    "http://192.168.0.245:5173"           → "192.168.0.245"
+    "localhost:3000"                       → "localhost"
     """
-
     cleaned = (
-    origin
-    .replace("https://", "")
-    .replace("http://", "")
-    .split("/")[0]
-    .strip()
-    .lower()
-    .lstrip("www.")
+        origin
+        .replace("https://", "")
+        .replace("http://", "")
+        .split("/")[0]   # remove path
+        .split(":")[0]   # remove port  ← THIS WAS MISSING IN YOUR VERSION
+        .strip()
+        .lower()
+        .lstrip("www.")
     )
     return cleaned
 
 
 def _normalize_origin(origin: str) -> str:
-    
+    """Map any local/dev IP to 'localhost' for DB comparison."""
     if origin in LOCALHOST_ALIASES:
         return "localhost"
     return origin
 
 
 def validate_token_and_origin(token: str, origin: str, db: Session) -> DomainToken:
-    
-    clean     = _clean_origin(origin)
-    normalized = _normalize_origin(clean)
+
+    clean      = _clean_origin(origin)       # "192.168.0.245"
+    normalized = _normalize_origin(clean)    # "localhost"
 
     # Token DB ma check karo
     token_row: DomainToken | None = (
@@ -68,8 +76,10 @@ def validate_token_and_origin(token: str, origin: str, db: Session) -> DomainTok
             detail="Domain subscription has expired.",
         )
 
-    # Registered domain normalize karo
-    registered = _normalize_origin(domain.domain_name.lower().lstrip("www."))
+    # Registered domain normalize karo (DB value also goes through same pipeline)
+    registered = _normalize_origin(
+        domain.domain_name.lower().lstrip("www.").split(":")[0]
+    )
 
     # Origin match check
     if normalized != registered and not normalized.endswith("." + registered):
