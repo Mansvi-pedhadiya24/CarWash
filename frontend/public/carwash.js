@@ -1,17 +1,18 @@
-
 (function () {
   'use strict';
 
   // ── Config from script tag attributes ────────────────────────
   const scriptTag = document.currentScript || document.querySelector('script[data-token]');
   const CONFIG = {
-    TOKEN:       scriptTag?.getAttribute('data-token')   || 'b737e5eb0768c62006fe11df67646a087dcaae250c97ec0809e47a6eb7a184f2',
+    TOKEN:        scriptTag?.getAttribute('data-token')   || 'b737e5eb0768c62006fe11df67646a087dcaae250c97ec0809e47a6eb7a184f2',
     BACKEND_HTTP: scriptTag?.getAttribute('data-backend') || 'http://192.168.0.245:8000',
     BACKEND_WS:   scriptTag?.getAttribute('data-ws')     || '',
     TITLE:        scriptTag?.getAttribute('data-title')   || 'CarWash AI Support',
     ACCENT:       scriptTag?.getAttribute('data-color')   || '#eb2525',
   };
-  CONFIG.BACKEND_WS = CONFIG.BACKEND_WS || CONFIG.BACKEND_HTTP.replace('https://', 'wss://').replace('http://', 'ws://');
+
+  // HTTPS અને HTTP બંને માટે ડાયનેમિક સપોર્ટ (Live Production URL માટે)
+  CONFIG.BACKEND_WS = CONFIG.BACKEND_WS || CONFIG.BACKEND_HTTP.replace(/^https:\/\//i, 'wss://').replace(/^http:\/\//i, 'ws://');
 
   const API = {
     VALIDATE: `${CONFIG.BACKEND_HTTP}/api/v1/validate`,
@@ -32,7 +33,7 @@
 
   // ── Inject Styles ─────────────────────────────────────────────
   const accent = CONFIG.ACCENT;
-const styles = `
+  const styles = `
 #__cw_chatbot_root *{
   box-sizing:border-box;
   margin:0;
@@ -60,19 +61,14 @@ const styles = `
   border-radius:50%;
   border:none;
   cursor:pointer;
-
   background:linear-gradient(135deg,#ff1a1a,#e30000);
-
   color:#fff;
-
   display:flex;
   align-items:center;
   justify-content:center;
-
   box-shadow:
     0 12px 30px rgba(255,0,0,.30),
     0 4px 10px rgba(0,0,0,.15);
-
   transition:.25s ease;
 }
 
@@ -90,22 +86,16 @@ const styles = `
   position:absolute;
   top:-4px;
   right:-4px;
-
   width:20px;
   height:20px;
-
   border-radius:50%;
-
   background:#f59e0b;
   color:white;
-
   font-size:11px;
   font-weight:700;
-
   display:flex;
   align-items:center;
   justify-content:center;
-
   border:2px solid white;
 }
 
@@ -116,24 +106,16 @@ const styles = `
 #__cw_window{
   width:390px;
   height:610px;
-
   margin-bottom:14px;
-
   border-radius:28px;
-
   overflow:hidden;
-
   background:#f8fafc;
-
   border:1px solid rgba(255,255,255,.5);
-
   box-shadow:
     0 25px 80px rgba(15,23,42,.18),
     0 10px 25px rgba(15,23,42,.08);
-
   display:flex;
   flex-direction:column;
-
   transition:
     transform .28s cubic-bezier(.16,1,.3,1),
     opacity .28s;
@@ -150,22 +132,13 @@ const styles = `
 ───────────────────────── */
 
 #__cw_header{
-  background:linear-gradient(
-    135deg,
-    #ff1d1d,
-    #e00000
-  );
-
+  background:linear-gradient(135deg,#ff1d1d,#e00000);
   color:white;
-
   padding:18px;
-
   display:flex;
   align-items:center;
   justify-content:space-between;
-
-  box-shadow:
-    0 4px 20px rgba(255,0,0,.25);
+  box-shadow:0 4px 20px rgba(255,0,0,.25);
 }
 
 #__cw_header .cw-left{
@@ -177,15 +150,10 @@ const styles = `
 #__cw_header .cw-avatar{
   width:52px;
   height:52px;
-
   border-radius:16px;
-
   background:rgba(255,255,255,.14);
-
   backdrop-filter:blur(10px);
-
   border:1px solid rgba(255,255,255,.18);
-
   display:flex;
   align-items:center;
   justify-content:center;
@@ -204,24 +172,18 @@ const styles = `
 
 #__cw_header .cw-status{
   margin-top:5px;
-
   font-size:12px;
-
   display:flex;
   align-items:center;
   gap:6px;
-
   color:rgba(255,255,255,.92);
 }
 
 #__cw_header .cw-dot{
   width:8px;
   height:8px;
-
   border-radius:50%;
-
   background:#22c55e;
-
   box-shadow:0 0 0 4px rgba(34,197,94,.18);
 }
 
@@ -237,18 +199,12 @@ const styles = `
 #__cw_header button{
   width:34px;
   height:34px;
-
   border:none;
   border-radius:10px;
-
   background:transparent;
-
   color:rgba(255,255,255,.85);
-
   cursor:pointer;
-
   transition:.2s ease;
-
   display:flex;
   align-items:center;
   justify-content:center;
@@ -270,18 +226,9 @@ const styles = `
 
 #__cw_messages{
   flex:1;
-
   overflow-y:auto;
-
   padding:20px 18px;
-
-  background:
-    linear-gradient(
-      180deg,
-      #f8fafc,
-      #f1f5f9
-    );
-
+  background:linear-gradient(180deg,#f8fafc,#f1f5f9);
   display:flex;
   flex-direction:column;
   gap:12px;
@@ -305,33 +252,20 @@ const styles = `
   flex-direction:column;
   align-items:center;
   justify-content:center;
-
   text-align:center;
-
   flex:1;
-
   padding:24px;
 }
 
 #__cw_empty .cw-icon-wrap{
   width:90px;
   height:90px;
-
   border-radius:50%;
-
-  background:
-    linear-gradient(
-      180deg,
-      #f1f5f9,
-      #e2e8f0
-    );
-
+  background:linear-gradient(180deg,#f1f5f9,#e2e8f0);
   display:flex;
   align-items:center;
   justify-content:center;
-
   margin-bottom:20px;
-
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.8),
     0 10px 25px rgba(0,0,0,.05);
@@ -340,24 +274,19 @@ const styles = `
 #__cw_empty .cw-icon-wrap svg{
   width:40px;
   height:40px;
-
   stroke:#ff1d1d;
 }
 
 #__cw_empty h4{
   font-size:18px;
   font-weight:700;
-
   color:#0f172a;
 }
 
 #__cw_empty p{
   font-size:14px;
-
   color:#94a3b8;
-
   margin-top:8px;
-
   line-height:1.7;
 }
 
@@ -368,53 +297,36 @@ const styles = `
 #__cw_chips{
   width:100%;
   max-width:300px;
-
   display:flex;
   flex-direction:column;
   gap:14px;
-
   margin-top:24px;
 }
 
 .cw-chip{
   background:white;
-
   border:1px solid #e2e8f0;
-
   border-radius:18px;
-
   padding:16px 18px;
-
   font-size:14px;
   font-weight:600;
-
   color:#334155;
-
   text-align:left;
-
   cursor:pointer;
-
   transition:.2s ease;
-
-  box-shadow:
-    0 4px 10px rgba(15,23,42,.04);
+  box-shadow:0 4px 10px rgba(15,23,42,.04);
 }
 
 .cw-chip:hover{
   transform:translateY(-2px);
-
   border-color:#ff1d1d;
-
   background:#fff5f5;
-
   color:#e00000;
-
-  box-shadow:
-    0 10px 20px rgba(255,0,0,.08);
+  box-shadow:0 10px 20px rgba(255,0,0,.08);
 }
 
 /* ─────────────────────────
-   BUBBLES
+   BUBBLES WITH CUSTOM RE-STYLING FOR MARKDOWN
 ───────────────────────── */
 
 .cw-bubble-wrap{
@@ -428,48 +340,37 @@ const styles = `
 
 .cw-bubble{
   max-width:82%;
-
   padding:14px 16px;
-
   border-radius:18px;
-
   font-size:13.5px;
-
   line-height:1.7;
-
   word-break:break-word;
-
   animation:cwSlide .25s ease;
 }
 
 .cw-bubble.user{
-  background:
-    linear-gradient(
-      135deg,
-      #ff1d1d,
-      #e00000
-    );
-
+  background:linear-gradient(135deg,#ff1d1d,#e00000);
   color:white;
-
   border-top-right-radius:6px;
-
-  box-shadow:
-    0 10px 20px rgba(255,0,0,.15);
+  box-shadow:0 10px 20px rgba(255,0,0,.15);
 }
 
 .cw-bubble.bot{
   background:white;
-
   color:#0f172a;
-
   border:1px solid #e2e8f0;
-
   border-top-left-radius:6px;
-
-  box-shadow:
-    0 4px 10px rgba(15,23,42,.04);
+  box-shadow:0 4px 10px rgba(15,23,42,.04);
 }
+
+/* બોટના લાઈવ ફોર્મેટિંગ (SS પ્રીમિયમ લુક) માટેની આંતરિક સ્ટાઈલ */
+.cw-bubble.bot p { margin-bottom: 6px; }
+.cw-bubble.bot p:last-child { margin-bottom: 0; }
+.cw-bubble.bot ul { list-style-type: disc; padding-left: 20px; margin: 6px 0; }
+.cw-bubble.bot ol { list-style-type: decimal; padding-left: 20px; margin: 6px 0; }
+.cw-bubble.bot li { font-size: 13.5px; margin-bottom: 4px; line-height: 1.6; }
+.cw-bubble.bot strong { font-weight: 700; color: #0f172a; }
+.cw-bubble.bot em { font-style: italic; }
 
 /* ─────────────────────────
    TYPING
@@ -477,28 +378,20 @@ const styles = `
 
 .cw-typing{
   padding:12px 14px;
-
   border-radius:16px;
-
   background:white;
-
   border:1px solid #e2e8f0;
-
   display:flex;
   align-items:center;
   gap:5px;
-
   width:fit-content;
 }
 
 .cw-typing span{
   width:6px;
   height:6px;
-
   border-radius:50%;
-
   background:#94a3b8;
-
   animation:cwBounce 1.2s infinite;
 }
 
@@ -511,12 +404,8 @@ const styles = `
 }
 
 @keyframes cwBounce{
-  0%,60%,100%{
-    transform:translateY(0);
-  }
-  30%{
-    transform:translateY(-5px);
-  }
+  0%,60%,100%{ transform:translateY(0); }
+  30%{ transform:translateY(-5px); }
 }
 
 /* ─────────────────────────
@@ -525,11 +414,8 @@ const styles = `
 
 #__cw_footer{
   padding:14px;
-
   background:white;
-
   border-top:1px solid #e2e8f0;
-
   display:flex;
   align-items:center;
   gap:10px;
@@ -537,32 +423,20 @@ const styles = `
 
 #__cw_input{
   flex:1;
-
   height:50px;
-
   border:none;
-
   border-radius:16px;
-
   background:#f1f5f9;
-
   padding:0 18px;
-
   font-size:14px;
-
   color:#0f172a;
-
   outline:none;
-
   transition:.2s ease;
 }
 
 #__cw_input:focus{
   background:white;
-
-  box-shadow:
-    0 0 0 4px rgba(255,0,0,.08);
-
+  box-shadow:0 0 0 4px rgba(255,0,0,.08);
   border:1px solid #ff1d1d;
 }
 
@@ -573,29 +447,15 @@ const styles = `
 #__cw_send{
   width:48px;
   height:48px;
-
   border:none;
-
   border-radius:16px;
-
   cursor:pointer;
-
-  background:
-    linear-gradient(
-      135deg,
-      #ff1d1d,
-      #e00000
-    );
-
+  background:linear-gradient(135deg,#ff1d1d,#e00000);
   color:white;
-
   display:flex;
   align-items:center;
   justify-content:center;
-
-  box-shadow:
-    0 10px 20px rgba(255,0,0,.20);
-
+  box-shadow:0 10px 20px rgba(255,0,0,.20);
   transition:.2s ease;
 }
 
@@ -613,14 +473,8 @@ const styles = `
 ───────────────────────── */
 
 @keyframes cwSlide{
-  from{
-    opacity:0;
-    transform:translateY(8px);
-  }
-  to{
-    opacity:1;
-    transform:translateY(0);
-  }
+  from{ opacity:0; transform:translateY(8px); }
+  to{ opacity:1; transform:translateY(0); }
 }
 
 /* ─────────────────────────
@@ -628,12 +482,10 @@ const styles = `
 ───────────────────────── */
 
 @media(max-width:440px){
-
   #__cw_chatbot_root{
     right:12px;
     bottom:12px;
   }
-
   #__cw_window{
     width:calc(100vw - 24px);
     height:78vh;
@@ -647,11 +499,11 @@ const styles = `
 
   // ── SVG Icons ─────────────────────────────────────────────────
   const icons = {
-    car: `<svg viewBox="0 0 24 24"><path d="M5 17H3a2 2 0 01-2-2v-4a2 2 0 012-2h1l3-5h12l3 5h1a2 2 0 012 2v4a2 2 0 01-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="17.5" r="2.5"/><path d="M5 12h14"/></svg>`,
-    msg: `<svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>`,
-    x:   `<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
-    trash:`<svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>`,
-    send: `<svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`,
+    car: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H3a2 2 0 01-2-2v-4a2 2 0 012-2h1l3-5h12l3 5h1a2 2 0 012 2v4a2 2 0 01-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="17.5" r="2.5"/><path d="M5 12h14"/></svg>`,
+    msg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>`,
+    x:   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
+    trash:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>`,
+    send: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`,
   };
 
   // ── Build DOM ─────────────────────────────────────────────────
@@ -749,10 +601,22 @@ const styles = `
   }
   clearBtn.addEventListener('click', clearChat);
 
-  // ── Chips ─────────────────────────────────────────────────────
-  root.querySelectorAll('.cw-chip').forEach(btn => {
-    btn.addEventListener('click', () => sendMessage(btn.dataset.msg));
-  });
+  // ── Chips Suggestion Click Handler ────────────────────────────
+  function handleSuggestionClick(text) {
+    if (text.includes("Full car Wash Price")) {
+      window.open('/CarWash_Pricing.pdf', '_blank');
+      return;
+    }
+    sendMessage(text);
+  }
+
+  // ── AI મોડેલના <think> ટેગ કાઢવા માટેનું ક્લીનર ──────────────────
+  function cleanContent(text) {
+    return text
+      .replace(/<think>[\s\S]*?<\/think>/gi, '')
+      .replace(/<think>[\s\S]*/gi, '')
+      .trim();
+  }
 
   // ── Render ────────────────────────────────────────────────────
   function scrollToBottom() {
@@ -762,9 +626,8 @@ const styles = `
   function renderMessages() {
     if (messages.length === 0) {
       msgBox.innerHTML = emptyState.outerHTML;
-      // re-attach chip listeners
       root.querySelectorAll('.cw-chip').forEach(btn => {
-        btn.addEventListener('click', () => sendMessage(btn.dataset.msg));
+        btn.addEventListener('click', () => handleSuggestionClick(btn.dataset.msg));
       });
       return;
     }
@@ -774,10 +637,17 @@ const styles = `
       const isUser = msg.role === 'user';
       const bubbleClass = isUser ? 'user' : 'bot';
       const wrapClass = isUser ? 'user' : '';
-      const content = escapeHtml(msg.content);
+      
+      // બોટના મેસેજ માટે થિંક બ્લોક રીમૂવ કરવો
+      const content = isUser ? msg.content : cleanContent(msg.content);
+      if (!content && !isUser) return;
+
+      // યુઝરના ટેક્સ્ટ પ્લેઈન રાખવા અને બોટ માટે એડવાન્સ માર્કડાઉન રેન્ડરર ચલાવવું
+      const formattedContent = isUser ? escapeHtml(content) : parseMarkdown(content);
+
       html += `
         <div class="cw-bubble-wrap ${wrapClass} cw-slide-in">
-          <div class="cw-bubble ${bubbleClass}">${content}</div>
+          <div class="cw-bubble ${bubbleClass}">${formattedContent}</div>
         </div>`;
     });
 
@@ -799,6 +669,41 @@ const styles = `
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/\n/g, '<br>');
+  }
+
+  // ── SS સ્ટાઈલ મુજબનું પ્રીમિયમ માર્કડાઉન એન્જિન ──────────────────
+  function parseMarkdown(text) {
+    let html = text;
+    // **બોલ્ડ** ટેક્સ્ટ કન્વર્ટ કરવા
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    // *ઈટાલિક* ટેક્સ્ટ કન્વર્ટ કરવા
+    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    
+    let lines = html.split('\n');
+    let inUl = false, inOl = false;
+    let processedLines = [];
+
+    lines.forEach(line => {
+      let trimmed = line.trim();
+      if (trimmed.startsWith('* ') || trimmed.startsWith('- ')) {
+        if (!inUl) { processedLines.push('<ul>'); inUl = true; }
+        processedLines.push(`<li>${trimmed.substring(2)}</li>`);
+      } else if (/^\d+\.\s/.test(trimmed)) {
+        if (!inOl) { processedLines.push('<ol>'); inOl = true; }
+        let rawContent = trimmed.replace(/^\d+\.\s/, '');
+        processedLines.push(`<li>${rawContent}</li>`);
+      } else {
+        if (inUl) { processedLines.push('</ul>'); inUl = false; }
+        if (inOl) { processedLines.push('</ol>'); inOl = false; }
+        if (trimmed) {
+          processedLines.push(`<p>${line}</p>`);
+        }
+      }
+    });
+    if (inUl) processedLines.push('</ul>');
+    if (inOl) processedLines.push('</ol>');
+
+    return processedLines.join('');
   }
 
   // ── WebSocket ─────────────────────────────────────────────────
@@ -865,7 +770,6 @@ const styles = `
     const trimmed = (text || '').trim();
     if (!trimmed) return;
 
-    // Hide empty state after first message
     const emptyEl = msgBox.querySelector('#__cw_empty');
     if (emptyEl) emptyEl.remove();
 
@@ -916,6 +820,11 @@ const styles = `
     }
   });
 
+  // Attach Initial Chip Listeners
+  root.querySelectorAll('.cw-chip').forEach(btn => {
+    btn.addEventListener('click', () => handleSuggestionClick(btn.dataset.msg));
+  });
+
   // ── Validate token & init connection ──────────────────────────
   async function init() {
     try {
@@ -933,7 +842,6 @@ const styles = `
         return;
       }
     } catch (_) {
-      // Network error in dev — still show widget
       console.warn('[CarWashBot] Backend unreachable — showing in dev mode.');
     }
     connect();
