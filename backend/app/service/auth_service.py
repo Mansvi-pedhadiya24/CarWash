@@ -14,15 +14,15 @@ def _clean_origin(origin: str) -> str:
     "127.0.0.1:8001" → "127.0.0.1"
     "localhost:3000" → "localhost"
     """
+
     cleaned = (
-        origin
-        .replace("https://", "")
-        .replace("http://", "")
-        .split("/")[0] 
-        .split(":")[0]   
-        .strip()
-        .lower()
-        .lstrip("www.")
+    origin
+    .replace("https://", "")
+    .replace("http://", "")
+    .split("/")[0]
+    .strip()
+    .lower()
+    .lstrip("www.")
     )
     return cleaned
 
